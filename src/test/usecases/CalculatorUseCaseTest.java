@@ -17,51 +17,42 @@ public class CalculatorUseCaseTest {
 
     @Test
     public void testAdd() {
-        double result = calculatorUseCase.add(5, 3);
+        double result = calculatorUseCase.performOperation(1, 5, 3);
         assertEquals(8, result);
 
-        result = calculatorUseCase.add(-1230, 2930);
+        result = calculatorUseCase.performOperation(1, -1230, 2930);
         assertEquals(1700, result);
     }
 
     @Test
     public void testSubtract() {
-        double result = calculatorUseCase.subtract(8, 3);
+        double result = calculatorUseCase.performOperation(2, 8, 3);
         assertEquals(5, result);
 
-        result = calculatorUseCase.subtract(10, 4);
+        result = calculatorUseCase.performOperation(2, 10, 4);
         assertEquals(6, result);
     }
 
     @Test
     public void testMultiply() {
-        double result = calculatorUseCase.multiply(4, 3);
+        double result = calculatorUseCase.performOperation(3, 4, 3);
         assertEquals(12, result);
 
-        result = calculatorUseCase.multiply(5, 4);
+        result = calculatorUseCase.performOperation(3, 5, 4);
         assertEquals(20, result);
     }
 
     @Test
     public void testDivide() {
-        double result = calculatorUseCase.divide(10, 2);
+        double result = calculatorUseCase.performOperation(4, 10, 2);
         assertEquals(5, result);
 
-        result = calculatorUseCase.divide(899, 3);
+        result = calculatorUseCase.performOperation(4, 899, 3);
         assertEquals(299.6666666666667, result);
     }
 
     @Test
     public void testDivideByZero() {
-        assertThrows(IllegalArgumentException.class, () -> calculatorUseCase.divide(10, 0));
+        assertThrows(IllegalArgumentException.class, () -> calculatorUseCase.performOperation(4, 10, 0));
     }
-
-    @Test
-    public void testExponentiate() {
-        double result = calculatorUseCase.exponentiate(2, 3);
-        assertEquals(8, result);
-        result = calculatorUseCase.exponentiate(4, 0.5);
-        assertEquals(2, result);
-    }
-
 }

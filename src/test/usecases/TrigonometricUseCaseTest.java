@@ -11,25 +11,25 @@ public class TrigonometricUseCaseTest {
 
     @Test
     public void testSine() {
-        double result = trigonometricUseCase.sine(30);
+        double result = trigonometricUseCase.performOperation(5, 30);
         assertEquals(0.5, result, DELTA);
     }
 
     @Test
     public void testCosine() {
-        double result = trigonometricUseCase.cosine(60);
+        double result = trigonometricUseCase.performOperation(6, 60);
         assertEquals(0.5, result, DELTA);
     }
 
     @Test
     public void testTangent() {
-        double result = trigonometricUseCase.tangent(45);
+        double result = trigonometricUseCase.performOperation(7, 45);
         assertEquals(1.0, result, DELTA);
     }
 
     @Test
     public void testSineWithNegativeAngle() {
-        double result = trigonometricUseCase.sine(-30);
+        double result = trigonometricUseCase.performOperation(5, -30);
         assertEquals(-0.5, result, DELTA);
     }
 }
