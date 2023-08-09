@@ -1,32 +1,32 @@
+/**
+ * ActionListener implementation for handling button clicks in a calculator app.
+ */
 package adapters;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
 
 public class ButtonClickListener implements ActionListener {
+    // Private fields for tracking calculator state
     private boolean isOperatorClicked = false;
     private String currentOperator = "";
     private double previousResult = 0.0;
+    // Instance of CalculatorFacade for performing calculations
     private final CalculatorFacade calculatorFacade;
+    // JTextField for displaying the calculator input and output
     private final JTextField displayField;
-    private HashMap<String, Integer> operatorMap = new HashMap<>();
-    {
-        operatorMap.put("+", 1);
-        operatorMap.put("-", 2);
-        operatorMap.put("*", 3);
-        operatorMap.put("/", 4);
-        operatorMap.put("sin", 5);
-        operatorMap.put("cos", 6);
-        operatorMap.put("tan", 7);
-    }
 
     public ButtonClickListener(CalculatorFacade calculatorFacade, JTextField displayField) {
         this.calculatorFacade = calculatorFacade;
         this.displayField = displayField;
     }
 
+    /**
+     * Handles button click events.
+     *
+     * @param e The ActionEvent triggered by the button click.
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand();
@@ -44,6 +44,11 @@ public class ButtonClickListener implements ActionListener {
         }
     }
 
+    /**
+     * Handles numeric input.
+     *
+     * @param command The input digit as a String.
+     */
     private void handleNumberInput(String command) {
         displayField.setText(displayField.getText() + command);
         if (!isOperatorClicked) {
@@ -51,6 +56,11 @@ public class ButtonClickListener implements ActionListener {
         }
     }
 
+    /**
+     * Handles operator input (both arithmetic and trigonometric).
+     *
+     * @param operator The input operator as a String.
+     */
     private void handleOperator(String operator) {
         if (!isOperatorClicked) {
             currentOperator = operator;
@@ -63,6 +73,9 @@ public class ButtonClickListener implements ActionListener {
         }
     }
 
+    /**
+     * Handles the "Equals" button click.
+     */
     private void handleEquals() {
         if (isOperatorClicked) {
             if (currentOperator.equals("cos") || currentOperator.equals("sin") || currentOperator.equals("tan")) {
@@ -85,6 +98,9 @@ public class ButtonClickListener implements ActionListener {
         }
     }
 
+    /**
+     * Handles the "C" (Clear) button click.
+     */
     private void handleClear() {
         displayField.setText("");
         currentOperator = "";
@@ -92,6 +108,9 @@ public class ButtonClickListener implements ActionListener {
         isOperatorClicked = false;
     }
 
+    /**
+     * Returns the arithmetic operation result.
+     */
     private double performArithmeticOperation(String operator, double a, double b) {
         if (operator.equals("+")) {
             return calculatorFacade.performOperation(1, a, b);
@@ -104,6 +123,9 @@ public class ButtonClickListener implements ActionListener {
         }
     }
 
+    /**
+     * Returns the trigonometric opertion result.
+     */
     private double performTrigonometricOperation(String operation, double angle) {
         if (operation.equals("sin")) {
             return calculatorFacade.performTrigonometricOperation(5, angle);

@@ -12,10 +12,19 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 
+/**
+ * The CalculatorUI class represents the graphical user interface for the calculator application.
+ * It allows users to perform arithmetic and trigonometric calculations using a graphical interface.
+ */
 public class CalculatorUI extends JFrame {
     private final CalculatorFacade calculatorFacade;
     private final JTextField displayField;
 
+    /**
+     * Constructs a CalculatorUI instance with the specified calculator facade.
+     *
+     * @param calculatorFacade The calculator facade to perform calculations.
+     */
     public CalculatorUI(CalculatorFacade calculatorFacade) {
         this.calculatorFacade = calculatorFacade;
 
@@ -51,6 +60,11 @@ public class CalculatorUI extends JFrame {
         setVisible(true);
     }
 
+    /**
+     * The main entry point for the calculator application.
+     *
+     * @param args Command-line arguments (not used).
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             UseCaseFactory useCaseFactory = new DefaultUseCaseFactory();
