@@ -1,5 +1,26 @@
 package usecases;
 
-public interface CalculatorUseCase {
-    double operate(double a, double b);
+public class CalculatorUseCase {
+    public double add(double a, double b) {
+        return a + b;
+    }
+
+    public double subtract(double a, double b) {
+        return a - b;
+    }
+
+    public double multiply(double a, double b) {
+        return a * b;
+    }
+
+    public double divide(double a, double b) {
+        if (b == 0) {
+            throw new IllegalArgumentException("Cannot divide by zero");
+        }
+        return a / b;
+    }
+
+    public double exponentiate(double base, double exponent) {
+        return Math.pow(base, exponent);
+    }
 }
