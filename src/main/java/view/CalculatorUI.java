@@ -1,142 +1,135 @@
 package view;
 
-import usecases.*;
+import adapters.CalculatorFacade;
+import adapters.CalculatorFacadeImpl;
+import usecases.DefaultUseCaseFactory;
+import usecases.UseCaseFactory;
 
-import java.util.InputMismatchException;
-import java.util.Scanner;
-import java.util.function.DoubleUnaryOperator;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+public class CalculatorUI extends JFrame {
+    private final CalculatorFacade calculatorFacade;
+    private final JTextField displayField;
+    private String currentOperator = "";
+    private double previousResult = 0.0;
+    private boolean isOperatorClicked = false;
 
-import java.util.InputMismatchException;
-import java.util.Scanner;
+    public CalculatorUI(CalculatorFacade calculatorFacade) {
+        this.calculatorFacade = calculatorFacade;
+        setTitle("Calculator");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(300, 400);
 
-public class CalculatorUI {
-    private final Scanner scanner;
-    private final UseCaseFactory useCaseFactory;
+        // Create and layout components
+        displayField = new JTextField();
+        displayField.setEditable(false);
+        add(displayField, BorderLayout.NORTH);
 
-    public CalculatorUI(UseCaseFactory useCaseFactory) {
-        scanner = new Scanner(System.in);
-        this.useCaseFactory = useCaseFactory;
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridLayout(5, 4));
+
+        String[] buttonLabels = {
+                "7", "8", "9", "/",
+                "4", "5", "6", "*",
+                "1", "2", "3", "-",
+                "C", "0", "=", "+",
+                "sin", "cos", "tan"
+        };
+
+        for (String label : buttonLabels) {
+            JButton button = new JButton(label);
+            button.addActionListener(new ButtonClickListener());
+            buttonPanel.add(button);
+        }
+
+        add(buttonPanel, BorderLayout.CENTER);
+        setVisible(true);
     }
 
-    public void run() {
-        boolean running = true;
+    private class ButtonClickListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            String command = e.getActionCommand();
 
-        while (running) {
-            System.out.println("1. Add");
-            System.out.println("2. Subtract");
-            System.out.println("3. Multiply");
-            System.out.println("4. Divide");
-            System.out.println("5. Exponentiate");
-            System.out.println("6. Sine");
-            System.out.println("7. Cosine");
-            System.out.println("8. Tangent");
-            System.out.println("9. Exit");
-            System.out.print("Choose an option: ");
-
-            if (scanner.hasNextInt()) {
-                int choice = scanner.nextInt();
-                if (choice >= 1 && choice <= 8) {
-                    if (choice >= 1 && choice <= 5) {
-                        performCalculatorOperation(choice);
-                    } else {
-                        performTrigonometricOperation(choice);
-                    }
-                } else if (choice == 9) {
-                    running = false;
+            if ("0123456789".contains(command)) {
+                if (isOperatorClicked) {
+                    displayField.setText(command);
+                    isOperatorClicked = false;
                 } else {
-                    System.out.println("Invalid choice. Please enter a valid option.");
+                    displayField.setText(displayField.getText() + command);
                 }
-            } else {
-                System.out.println("Invalid input. Please enter a valid number.");
-                scanner.next(); // Clear the invalid input
+            } else if ("+-*/".contains(command)) {
+                if (currentOperator.isEmpty()) {
+                    currentOperator = command;
+                    previousResult = Double.parseDouble(displayField.getText()); // Store the previous result
+                    isOperatorClicked = true;
+                }
+            } else if ("sin".equals(command) || "cos".equals(command) || "tan".equals(command)) {
+                performTrigonometricOperation(command);
+            } else if (command.equals("=")) {
+                if (!currentOperator.isEmpty()) {
+                    double newValue = Double.parseDouble(displayField.getText());
+                    double result = performArithmeticOperation(currentOperator, previousResult, newValue); // Use previousResult as the first operand
+                    displayField.setText(String.valueOf(result));
+                    currentOperator = "";
+                    previousResult = result; // Store the result for chaining
+                    isOperatorClicked = true;
+                }
+            } else if (command.equals("C")) {
+                displayField.setText("");
+                currentOperator = "";
+                previousResult = 0.0; // Reset the previous result
+                isOperatorClicked = false;
             }
         }
     }
 
-    private void performCalculatorOperation(int choice) {
-        CalculatorUseCase calculatorUseCase = useCaseFactory.createCalculatorUseCase();
-        try {
-            System.out.print("Enter first number: ");
-            double a = scanner.nextDouble();
-            System.out.print("Enter second number: ");
-            double b = scanner.nextDouble();
+    private double performArithmeticOperation(String operator, double a, double b) {
+        return switch (operator) {
+            case "+" -> calculatorFacade.performOperation(1, a, b, 0, 0);
+            case "-" -> calculatorFacade.performOperation(2, a, b, 0, 0);
+            case "*" -> calculatorFacade.performOperation(3, a, b, 0, 0);
+            case "/" -> calculatorFacade.performOperation(4, a, b, 0, 0);
+            default -> 0.0;
+        };
+    }
 
+    private void performTrigonometricOperation(String operation) {
+        try {
+            String input = displayField.getText();
             double result;
-            switch (choice) {
-                case 1:
-                    result = calculatorUseCase.add(a, b);
-                    break;
-                case 2:
-                    result = calculatorUseCase.subtract(a, b);
-                    break;
-                case 3:
-                    result = calculatorUseCase.multiply(a, b);
-                    break;
-                case 4:
-                    result = calculatorUseCase.divide(a, b);
-                    break;
-                case 5:
-                    System.out.print("Enter base: ");
-                    double base = scanner.nextDouble();
-                    System.out.print("Enter exponent: ");
-                    double exponent = scanner.nextDouble();
-                    result = calculatorUseCase.exponentiate(base, exponent);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Invalid operation");
+
+            double angleDegrees = Double.parseDouble(input.trim());
+            double angleRadians = Math.toRadians(angleDegrees);
+
+            switch (operation) {
+                case "sin" -> result = Math.sin(angleRadians);
+                case "cos" -> result = Math.cos(angleRadians);
+                case "tan" -> result = Math.tan(angleRadians);
+                default -> {
+                    displayField.setText("Invalid operation");
+                    return;
+                }
             }
 
-            System.out.println("Result: " + result);
-        } catch (InputMismatchException e) {
-            System.out.println("Invalid input. Please enter a valid number.");
-            scanner.next(); // Clear the invalid input
-        } catch (Exception e) {
-            System.out.println("An error occurred: " + e.getMessage());
-        }
-    }
-
-    private void performTrigonometricOperation(int choice) {
-        TrigonometricUseCase trigonometricUseCase = useCaseFactory.createTrigonometricUseCase();
-        DoubleUnaryOperator operation = null;
-        String operationName = "";
-
-        switch (choice) {
-            case 6:
-                operation = trigonometricUseCase::sine;
-                operationName = "Sine";
-                break;
-            case 7:
-                operation = trigonometricUseCase::cosine;
-                operationName = "Cosine";
-                break;
-            case 8:
-                operation = trigonometricUseCase::tangent;
-                operationName = "Tangent";
-                break;
-            default:
-                System.out.println("Invalid choice.");
-                return;
-        }
-
-        try {
-            System.out.print("Enter angle in degrees: ");
-            double angle = scanner.nextDouble();
-
-            double result = operation.applyAsDouble(angle);
-            System.out.println(operationName + " Result: " + result);
-        } catch (InputMismatchException e) {
-            System.out.println("Invalid input. Please enter a valid number.");
-            scanner.next(); // Clear the invalid input
-        } catch (Exception e) {
-            System.out.println("An error occurred: " + e.getMessage());
+            displayField.setText(String.valueOf(result));
+        } catch (NumberFormatException ex) {
+            displayField.setText("Invalid input");
         }
     }
 
 
     public static void main(String[] args) {
-        UseCaseFactory useCaseFactory = new DefaultUseCaseFactory();
-        CalculatorUI calculatorUI = new CalculatorUI(useCaseFactory);
-        calculatorUI.run();
+        SwingUtilities.invokeLater(() -> {
+            UseCaseFactory useCaseFactory = new DefaultUseCaseFactory();
+            CalculatorFacade calculatorFacade = new CalculatorFacadeImpl(
+                    useCaseFactory.createCalculatorUseCase(),
+                    useCaseFactory.createTrigonometricUseCase()
+            );
+            new CalculatorUI(calculatorFacade);
+        });
     }
 }
+
