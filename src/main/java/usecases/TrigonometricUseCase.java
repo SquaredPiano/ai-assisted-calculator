@@ -1,15 +1,22 @@
 package usecases;
 
+import java.util.HashMap;
+
 public class TrigonometricUseCase {
-    public double sine(double angle) {
-        return Math.sin(Math.toRadians(angle));
+    private final HashMap<Integer, TrigonometricOperation> operationStrategies;
+
+    public TrigonometricUseCase() {
+        operationStrategies = new HashMap<>();
+        operationStrategies.put(5, new SineOperationStrategy());
+        operationStrategies.put(6, new CosineOperationStrategy());
+        operationStrategies.put(7, new TangentOperationStrategy());
     }
 
-    public double cosine(double angle) {
-        return Math.cos(Math.toRadians(angle));
-    }
-
-    public double tangent(double angle) {
-        return Math.tan(Math.toRadians(angle));
+    public double performOperation(int operationChoice, double angle) {
+        TrigonometricOperation strategy = operationStrategies.get(operationChoice);
+        if (strategy == null) {
+            throw new IllegalArgumentException("Invalid operation");
+        }
+        return strategy.execute(angle);
     }
 }
