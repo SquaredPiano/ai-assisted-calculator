@@ -1,8 +1,11 @@
+import usecases.DefaultUseCaseFactory;
+import usecases.UseCaseFactory;
 import view.CalculatorUI;
 
 public class Main {
     public static void main(String[] args) {
-        CalculatorUI calculatorUI = new CalculatorUI();
+        UseCaseFactory useCaseFactory = new DefaultUseCaseFactory();
+        CalculatorUI calculatorUI = new CalculatorUI(useCaseFactory);
         calculatorUI.run();
     }
 }
